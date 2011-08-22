@@ -59,7 +59,7 @@ driver Params { numIterations = k } spec = vcat
   , text "    sampleExterns();"
   , text "    atm_step();"
   , text "    sbv_step();"
-  , text "    verifyObservers();"
+  , text "    verify_observers();"
   , text "  }"
   , text ""
   , text "  return 0;"
@@ -102,7 +102,7 @@ verifyObservers spec = vcat
 
     verifyObserver :: Observer -> Doc
     verifyObserver (Observer name _ _) =
-      text "assert(" <> text "atm_" <> text name <+> text "=" <+> text "sbv_" <>
+      text "assert(" <> text "atm_" <> text name <+> text "==" <+> text "sbv_" <>
       text name <> text ");"
 
 typeSpec :: UType -> Doc
