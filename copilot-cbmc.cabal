@@ -1,7 +1,7 @@
 cabal-version             : >= 1.10
 name                      : copilot-cbmc
 version                   : 0.11
-synopsis                  : Copilot interface to the CBMC C model checker to prove equivalence between backends.
+synopsis                  : Copilot interface to a C model-checker.
 description               : Depends on CBMC <http://www.cprover.org/cbmc/>.  Generates a driver to prove the Atom and SBV backends generate equivalent code.
 license                   : BSD3
 license-file              : LICENSE
