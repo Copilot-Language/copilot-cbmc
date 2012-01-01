@@ -4,7 +4,14 @@
 
 {-# LANGUAGE GADTs #-}
 
-module Copilot.Tools.CBMC (Params (..), defaultParams, genCBMC) where
+module Copilot.Tools.CBMC 
+  ( Params (..)
+  , defaultParams
+  , genCBMC
+  , atomPrefix
+  , sbvPrefix
+  , appendPrefix
+  ) where
 
 import Copilot.Core
 import qualified Copilot.Compile.C99 as C99
