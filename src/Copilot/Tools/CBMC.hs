@@ -12,39 +12,48 @@ import qualified Copilot.Compile.SBV as SBV
 import qualified System.IO as I
 import Text.PrettyPrint.HughesPJ
 
+--------------------------------------------------------------------------------
+
 data Params = Params
   { numIterations :: Int }
+
+--------------------------------------------------------------------------------
 
 defaultParams :: Params
 defaultParams = Params
   { numIterations = 10 }
 
+--------------------------------------------------------------------------------
+
+atomPrefix, sbvPrefix :: Maybe String
+atomPrefix = Just "atm"
+sbvPrefix = Just "sbv"
+
+appendPrefix :: Maybe String -> String -> String
+appendPrefix (Just pre) name = pre ++ "_" ++ name
+appendPrefix Nothing name = name
+
+--------------------------------------------------------------------------------
+
 genCBMC :: Params -> Spec -> IO ()
 genCBMC params spec =
   do
-    C99.compile (C99.defaultParams { C99.prefix = Just "atm" }) spec
-    SBV.compile (SBV.defaultParams { SBV.prefix = Just "sbv" }) spec
+    C99.compile (C99.defaultParams { C99.prefix = atomPrefix }) spec
+    SBV.compile (SBV.defaultParams { SBV.prefix = sbvPrefix }) spec
     h <- I.openFile "cbmc_driver.c" I.WriteMode
     I.hPutStrLn h (render (driver params spec))
+
+--------------------------------------------------------------------------------
 
 driver :: Params -> Spec -> Doc
 driver Params { numIterations = k } spec = vcat
   [ text "#include <stdbool.h>"
   , text "#include <stdint.h>"
-  , text "#include \"atm_copilot.h\""
-  , text "#include \"sbv_copilot/sbv_copilot.h\""
+  , text "#include <assert.h>"
+  , include atomPrefix C99.c99DirName C99.c99FileRoot
+  , include sbvPrefix SBV.sbvDirName "copilot"
   , text ""
-  , text "int32_t nondet_bool();"
-  , text "int32_t nondet_uint8_t();"
-  , text "int32_t nondet_uint16_t();"
-  , text "int32_t nondet_uint32_t();"
-  , text "int32_t nondet_uint64_t();"
-  , text "int32_t nondet_int8_t();"
-  , text "int32_t nondet_int16_t();"
-  , text "int32_t nondet_int32_t();"
-  , text "int32_t nondet_int64_t();"
-  , text "int32_t nondet_float();"
-  , text "int32_t nondet_double();"
+  , declNonDets spec
   , text ""
   , declExterns spec
   , text ""
@@ -59,8 +68,8 @@ driver Params { numIterations = k } spec = vcat
   , text "  for (i = 0; i < " <> int k <> text "; i++)"
   , text "  {"
   , text "    sampleExterns();"
-  , text "    atm_step();"
-  , text "    sbv_step();"
+  , text $ "    " ++ appendPrefix atomPrefix "step();"
+  , text $ "    " ++ appendPrefix sbvPrefix "step();"
   , text "    verify_observers();"
   , text "  }"
   , text ""
@@ -68,13 +77,35 @@ driver Params { numIterations = k } spec = vcat
   , text "}"
   ]
 
+  where
+  include prefix dir header = text "#include" <+> doubleQuotes
+     (   text (appendPrefix prefix dir) <> text"/" 
+      <> text (appendPrefix prefix (header ++ ".h"))
+     )
+
+--------------------------------------------------------------------------------
+
+declNonDets :: Spec -> Doc
+declNonDets = vcat . map declNonDet . externVars
+  where
+  declNonDet :: ExtVar -> Doc
+  declNonDet ext@(ExtVar _ t) = typeSpec t <+> nonDetName ext 
+
+--------------------------------------------------------------------------------
+
+nonDetName :: ExtVar -> Doc
+nonDetName (ExtVar name t) = 
+  text ("nondet_" ++ name ++ "_") <> (typeSpec t) <> text "();"
+
+--------------------------------------------------------------------------------
+
 declExterns :: Spec -> Doc
 declExterns = vcat . map declExtern . externVars
-
   where
+  declExtern :: ExtVar -> Doc
+  declExtern (ExtVar name t) = typeSpec t <+> text name <> semi
 
-    declExtern :: ExtVar -> Doc
-    declExtern (ExtVar name t) = typeSpec t <+> text name <> semi
+--------------------------------------------------------------------------------
 
 sampleExterns :: Spec -> Doc
 sampleExterns spec = vcat
@@ -86,10 +117,11 @@ sampleExterns spec = vcat
   ]
 
   where
+  sampleExtern :: ExtVar -> Doc
+  sampleExtern ext@(ExtVar name _) =
+    text name <+> text "=" <+> nonDetName ext
 
-    sampleExtern :: ExtVar -> Doc
-    sampleExtern (ExtVar name t) =
-      text name <+> text "=" <+> text "nondet_" <> typeSpec t <> text "();"
+--------------------------------------------------------------------------------
 
 verifyObservers :: Spec -> Doc
 verifyObservers spec = vcat
@@ -101,17 +133,16 @@ verifyObservers spec = vcat
   ]
 
   where
+  verifyObserver :: Observer -> Doc
+  verifyObserver (Observer name _ _) =
+    text "assert(" <> text (appendPrefix atomPrefix name) <+> text "==" 
+      <+> text (appendPrefix sbvPrefix name) <> text ");"
 
-    verifyObserver :: Observer -> Doc
-    verifyObserver (Observer name _ _) =
-      text "assert(" <> text "atm_" <> text name <+> text "==" <+> text "sbv_" <>
-      text name <> text ");"
+--------------------------------------------------------------------------------
 
 typeSpec :: UType -> Doc
 typeSpec UType { uTypeType = t } = text (typeSpec' t)
-
   where
-
   typeSpec' Bool   = "bool"
   typeSpec' Int8   = "int8_t"
   typeSpec' Int16  = "int16_t"
@@ -123,3 +154,5 @@ typeSpec UType { uTypeType = t } = text (typeSpec' t)
   typeSpec' Word64 = "uint64_t"
   typeSpec' Float  = "float"
   typeSpec' Double = "double"
+
+--------------------------------------------------------------------------------
