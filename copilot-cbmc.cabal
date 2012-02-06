@@ -8,7 +8,7 @@ license-file              : LICENSE
 maintainer                : leepike@galois.com
 stability                 : Experimental
 category                  : Language, Embedded
-build-type                : Custom
+build-type                : Simple
 extra-source-files        : README.md
 
 author                    : Lee Pike
@@ -26,12 +26,12 @@ library
   ghc-prof-options        : -auto-all -caf-all
 
   build-depends           : base >= 4.3 && < 5
-                          , bytestring
-                          , copilot-core
+                          , bytestring >= 0.9
+                          , copilot-core >= 0.2.3
                           , directory >= 1.1
                           , process >= 1.0
-                          , pretty
-                          , copilot-sbv
-                          , copilot-c99
+                          , pretty >= 1.0.1
+                          , copilot-sbv >= 0.4
+                          , copilot-c99 >= 0.2.4
 
   exposed-modules         : Copilot.Tools.CBMC
