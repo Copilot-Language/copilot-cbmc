@@ -2,16 +2,16 @@ cabal-version             : >= 1.10
 name                      : copilot-cbmc
 version                   : 0.23
 synopsis                  : Copilot interface to a C model-checker.
-description               : 
+description               :
   Depends on CBMC <http://www.cprover.org/cbmc/>.  Generates a driver to prove
   the Atom and SBV backends generate equivalent code.
-  . 
+  .
   Copilot is a stream (i.e., infinite lists) domain-specific language (DSL) in
   Haskell that compiles into embedded C.  Copilot contains an interpreter,
   multiple back-end compilers, and other verification tools.  A tutorial, bug
   reports, and todos are available at
-  <https://github.com/niswegmann/copilot-discussion>.  
-  .  
+  <https://github.com/leepike/copilot-discussion>.
+  .
   Examples are available at
   <https://github.com/leepike/Copilot/tree/master/Examples>.
 
@@ -37,7 +37,7 @@ library
   ghc-options             : -Wall -fwarn-tabs
   ghc-prof-options        : -auto-all -caf-all
 
-  build-depends           : base >= 4.3 && < 5
+  build-depends           : base >= 4.3
                           , bytestring >= 0.9
                           , copilot-core >= 0.2.4
                           , directory >= 1.1
