@@ -3,6 +3,7 @@
 --------------------------------------------------------------------------------
 
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE Rank2Types #-}
 
 module Copilot.Tools.CBMC 
   ( Params (..)
@@ -150,6 +151,7 @@ verifyObservers spec = vcat
 typeSpec :: UType -> Doc
 typeSpec UType { uTypeType = t } = text (typeSpec' t)
   where
+  typeSpec' :: Type t -> String
   typeSpec' Bool   = "bool"
   typeSpec' Int8   = "int8_t"
   typeSpec' Int16  = "int16_t"
