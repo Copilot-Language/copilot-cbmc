@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Copilot-Language/copilot-cbmc.svg?branch=master)](https://travis-ci.org/Copilot-Language/copilot-cbmc)
+
 Overview
 ========
 [copilot-cbmc](http://hackage.haskell.org/package/copilot-cbmc) A tool to
