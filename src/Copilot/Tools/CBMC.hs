@@ -97,12 +97,12 @@ declNonDets :: Spec -> Doc
 declNonDets = vcat . map declNonDet . externVars
   where
   declNonDet :: ExtVar -> Doc
-  declNonDet ext@(ExtVar _ t) = typeSpec t <+> nonDetName ext 
+  declNonDet ext@(ExtVar _ _ t) = typeSpec t <+> nonDetName ext 
 
 --------------------------------------------------------------------------------
 
 nonDetName :: ExtVar -> Doc
-nonDetName (ExtVar name t) = 
+nonDetName (ExtVar name _ t) = 
   text ("nondet_" ++ name ++ "_") <> (typeSpec t) <> text "();"
 
 --------------------------------------------------------------------------------
@@ -111,7 +111,7 @@ declExterns :: Spec -> Doc
 declExterns = vcat . map declExtern . externVars
   where
   declExtern :: ExtVar -> Doc
-  declExtern (ExtVar name t) = typeSpec t <+> text name <> semi
+  declExtern (ExtVar name _ t) = typeSpec t <+> text name <> semi
 
 --------------------------------------------------------------------------------
 
@@ -126,7 +126,7 @@ sampleExterns spec = vcat
 
   where
   sampleExtern :: ExtVar -> Doc
-  sampleExtern ext@(ExtVar name _) =
+  sampleExtern ext@(ExtVar name _ _) =
     text name <+> text "=" <+> nonDetName ext
 
 --------------------------------------------------------------------------------
