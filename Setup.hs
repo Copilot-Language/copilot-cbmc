@@ -1,6 +1,6 @@
 module Main ( main ) where
 
-import Distribution.Simple (defaultMainWithHooks, simpleUserHooks, postInst)
+import Distribution.Simple (defaultMain)
 
 main :: IO ()
 main = defaultMain 
