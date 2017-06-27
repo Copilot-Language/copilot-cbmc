@@ -1,6 +1,6 @@
 cabal-version             : >= 1.10
 name                      : copilot-cbmc
-version                   : 2.2.0
+version                   : 2.2.1
 synopsis                  : Copilot interface to a C model-checker.
 description               :
   Depends on CBMC <http://www.cprover.org/cbmc/>.  Generates a driver to prove
@@ -39,11 +39,11 @@ library
 
   build-depends           : base >= 4.0 && < 5.0
                           , bytestring >= 0.9
-                          , copilot-core >= 0.2.4
+                          , copilot-core >= 2.2.1
                           , directory >= 1.1
                           , process >= 1.0
                           , pretty >= 1.0.1
-                          , copilot-sbv >= 0.6
-                          , copilot-c99 >= 0.2.4
+                          , copilot-sbv >= 2.2.1
+                          , copilot-c99 >= 2.2.1
 
   exposed-modules         : Copilot.Tools.CBMC
